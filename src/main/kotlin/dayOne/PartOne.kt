@@ -13,7 +13,7 @@ class PartOne {
                     tempInventory = 0
                 }
             }
-            println("Elve with highest Calories: " + elvesInventory.max())
+            println("Elf with highest Calories: " + elvesInventory.max())
         }
     }
 }
