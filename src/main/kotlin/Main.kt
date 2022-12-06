@@ -40,4 +40,12 @@ fun main() {
     println("Part Two:")
     dayFive.PartTwo.execute(lines)
     println()
+
+    lines = readFileAsLinesUsingReadLines("src/main/resources/DaySixInput.txt")
+    println("Day 6:")
+    println("Part One:")
+    daySix.PartOne.execute(lines)
+    println("Part Two:")
+    daySix.PartTwo.execute(lines)
+    println()
 }
