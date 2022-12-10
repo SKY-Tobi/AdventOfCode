@@ -2,8 +2,8 @@ package daySeven
 
 class PartTwo {
     companion object {
-        private const val totalDiskSpace = 70000000
-        private const val spaceNeededForUpdate = 30000000
+        private const val TOTAL_DISK_SPACE = 70000000
+        private const val SPACE_NEEDED_FOR_UPDATE = 30000000
 
         fun execute(lines: List<String>) {
             var homeNode: Node? = null
@@ -40,9 +40,9 @@ class PartTwo {
             }
             println(homeNode.toString())
             println()
-            println(homeNode?.getSpaceUsed(0).toString() + " space used of " + totalDiskSpace)
-            println((totalDiskSpace - homeNode?.getSpaceUsed(0)!!).toString() + " out of " + spaceNeededForUpdate + " available for update")
-            val spaceToDelete = spaceNeededForUpdate - (totalDiskSpace - homeNode?.getSpaceUsed(0)!!)
+            println(homeNode?.getSpaceUsed(0).toString() + " space used of " + TOTAL_DISK_SPACE)
+            println((TOTAL_DISK_SPACE - homeNode?.getSpaceUsed(0)!!).toString() + " out of " + SPACE_NEEDED_FOR_UPDATE + " available for update")
+            val spaceToDelete = SPACE_NEEDED_FOR_UPDATE - (TOTAL_DISK_SPACE - homeNode?.getSpaceUsed(0)!!)
             val fileCounter = FileCounter()
             fileCounter.spaceToDelete = spaceToDelete.toLong()
             println("Size of Folder to delete: " + homeNode?.collectAllDirectoryNodesWithItsSize(fileCounter)?.nodes?.filter { it.size >= spaceToDelete }

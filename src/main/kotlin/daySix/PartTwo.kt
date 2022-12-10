@@ -2,7 +2,7 @@ package daySix
 
 class PartTwo {
     companion object {
-        private const val amountOfUniqueCharacters = 14
+        private const val AMOUNT_OF_UNIQUE_CHARACTERS = 14
 
         fun execute(lines: List<String>) {
             var markerLocation = 0
@@ -10,15 +10,15 @@ class PartTwo {
             run breaker@{
                 datastream.forEachIndexed { index, it ->
                     // continue if there aren't enough amount of characters to form a packet
-                    if (index < amountOfUniqueCharacters) {
+                    if (index < AMOUNT_OF_UNIQUE_CHARACTERS) {
                         return@forEachIndexed
                     }
                     val amountOfUniqueCharactersFound = mutableListOf<String>()
-                    for (i in 0 until amountOfUniqueCharacters) {
+                    for (i in 0 until AMOUNT_OF_UNIQUE_CHARACTERS) {
                         amountOfUniqueCharactersFound.add(datastream[index - i])
                     }
 
-                    if (amountOfUniqueCharactersFound.distinct().size == amountOfUniqueCharacters) {
+                    if (amountOfUniqueCharactersFound.distinct().size == AMOUNT_OF_UNIQUE_CHARACTERS) {
                         markerLocation = index
                         return@breaker
                     }
