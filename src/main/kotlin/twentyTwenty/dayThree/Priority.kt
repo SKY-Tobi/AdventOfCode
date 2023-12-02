@@ -1,0 +1,62 @@
+package twentyTwenty.dayThree
+
+enum class Priority(val priorityName: String, val priority: Int) {
+    A_LOWERCASE("a", 1),
+    B_LOWERCASE("b", 2),
+    C_LOWERCASE("c", 3),
+    D_LOWERCASE("d", 4),
+    E_LOWERCASE("e", 5),
+    F_LOWERCASE("f", 6),
+    G_LOWERCASE("g", 7),
+    H_LOWERCASE("h", 8),
+    I_LOWERCASE("i", 9),
+    J_LOWERCASE("j", 10),
+    K_LOWERCASE("k", 11),
+    L_LOWERCASE("l", 12),
+    M_LOWERCASE("m", 13),
+    N_LOWERCASE("n", 14),
+    O_LOWERCASE("o", 15),
+    P_LOWERCASE("p", 16),
+    Q_LOWERCASE("q", 17),
+    R_LOWERCASE("r", 18),
+    S_LOWERCASE("s", 19),
+    T_LOWERCASE("t", 20),
+    U_LOWERCASE("u", 21),
+    V_LOWERCASE("v", 22),
+    W_LOWERCASE("w", 23),
+    X_LOWERCASE("x", 24),
+    Y_LOWERCASE("y", 25),
+    Z_LOWERCASE("z", 26),
+
+    A_UPPERCASE("A", 27),
+    B_UPPERCASE("B", 28),
+    C_UPPERCASE("C", 29),
+    D_UPPERCASE("D", 30),
+    E_UPPERCASE("E", 31),
+    F_UPPERCASE("F", 32),
+    G_UPPERCASE("G", 33),
+    H_UPPERCASE("H", 34),
+    I_UPPERCASE("I", 35),
+    J_UPPERCASE("J", 36),
+    K_UPPERCASE("K", 37),
+    L_UPPERCASE("L", 38),
+    M_UPPERCASE("M", 39),
+    N_UPPERCASE("N", 40),
+    O_UPPERCASE("O", 41),
+    P_UPPERCASE("P", 42),
+    Q_UPPERCASE("Q", 43),
+    R_UPPERCASE("R", 44),
+    S_UPPERCASE("S", 45),
+    T_UPPERCASE("T", 46),
+    U_UPPERCASE("U", 47),
+    V_UPPERCASE("V", 48),
+    W_UPPERCASE("W", 49),
+    X_UPPERCASE("X", 50),
+    Y_UPPERCASE("Y", 51),
+    Z_UPPERCASE("Z", 52);
+
+    companion object {
+        fun getPriorityByName(priorityName: String): Int =
+            Priority.values().first { it.priorityName == priorityName }.priority
+    }
+}
