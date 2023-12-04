@@ -8,7 +8,7 @@ class PartOne {
             lines.forEach {
                 val input = it.split(":")[1].split("|")
                 val pair = Pair(convertNumbersToList(input[0]), convertNumbersToList(input[1]))
-                var points = 0;
+                var points = 0
                 pair.second.forEach { number ->
                     if(pair.first.contains(number)){
                         if(points == 0) {
