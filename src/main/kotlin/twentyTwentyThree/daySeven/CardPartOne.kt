@@ -16,6 +16,6 @@ enum class CardPartOne (val value: Char, val strength: Int) {
     TWO('2', 1);
 
     companion object {
-        infix fun from(value: Char): CardPartOne? = CardPartOne.values().firstOrNull { it.value == value }
+        infix fun fromPartOne(value: Char): CardPartOne? = CardPartOne.values().firstOrNull { it.value == value }
     }
 }

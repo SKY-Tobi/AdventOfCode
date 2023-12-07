@@ -10,8 +10,8 @@ class PartOne {
                         val hand1Cards = hand1.cards.toCharArray()
                         val hand2Cards = hand2.cards.toCharArray()
                         repeat(hand1.cards.length) { index ->
-                            val hand1Strength = (CardPartOne from hand1Cards[index])?.strength
-                            val hand2Strength = (CardPartOne from hand2Cards[index])?.strength
+                            val hand1Strength = (CardPartOne fromPartOne hand1Cards[index])?.strength
+                            val hand2Strength = (CardPartOne fromPartOne hand2Cards[index])?.strength
                             if (hand1Strength != null && hand2Strength != null && hand1Strength != hand2Strength) {
                                 return hand1Strength - hand2Strength
                             }
