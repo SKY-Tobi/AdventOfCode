@@ -171,20 +171,15 @@ class PartOne {
                         val nextCardinalDirection = evaluateValidPipeFromSouth(map[y - 1][x])
                         if (nextCardinalDirection != null) {
                             currentNode.north = PipeNode(null, null, null, null, index + 1)
-                            if (evaluateLoop(
-                                    currentNode.north!!,
-                                    pipeMap,
-                                    y - 1,
-                                    x,
-                                    index + 1,
-                                    Pair(y, x),
-                                    nextCardinalDirection
-                                ) != null
-                            ) {
-                                return currentNode
-                            } else {
-                                currentNode.north = null
-                            }
+                            return evaluateLoop(
+                                currentNode.north!!,
+                                pipeMap,
+                                y - 1,
+                                x,
+                                index + 1,
+                                Pair(y, x),
+                                nextCardinalDirection
+                            )
                         }
                     }
 
@@ -198,20 +193,15 @@ class PartOne {
                         val nextCardinalDirection = evaluateValidPipeFromWest(map[y][x + 1])
                         if (nextCardinalDirection != null) {
                             currentNode.east = PipeNode(null, null, null, null, index + 1)
-                            if (evaluateLoop(
-                                    currentNode.east!!,
-                                    pipeMap,
-                                    y,
-                                    x + 1,
-                                    index + 1,
-                                    Pair(y, x),
-                                    nextCardinalDirection
-                                ) != null
-                            ) {
-                                return currentNode
-                            } else {
-                                currentNode.east = null
-                            }
+                            return evaluateLoop(
+                                currentNode.east!!,
+                                pipeMap,
+                                y,
+                                x + 1,
+                                index + 1,
+                                Pair(y, x),
+                                nextCardinalDirection
+                            )
                         }
                     }
 
@@ -225,20 +215,15 @@ class PartOne {
                         val nextCardinalDirection = evaluateValidPipeFromNorth(map[y + 1][x])
                         if (nextCardinalDirection != null) {
                             currentNode.south = PipeNode(null, null, null, null, index + 1)
-                            if (evaluateLoop(
-                                    currentNode.south!!,
-                                    pipeMap,
-                                    y + 1,
-                                    x,
-                                    index + 1,
-                                    Pair(y, x),
-                                    nextCardinalDirection
-                                ) != null
-                            ) {
-                                return currentNode
-                            } else {
-                                currentNode.south = null
-                            }
+                            return evaluateLoop(
+                                currentNode.south!!,
+                                pipeMap,
+                                y + 1,
+                                x,
+                                index + 1,
+                                Pair(y, x),
+                                nextCardinalDirection
+                            )
                         }
                     }
 
@@ -252,20 +237,15 @@ class PartOne {
                         val nextCardinalDirection = evaluateValidPipeFromEast(map[y][x - 1])
                         if (nextCardinalDirection != null) {
                             currentNode.west = PipeNode(null, null, null, null, index + 1)
-                            if (evaluateLoop(
-                                    currentNode.west!!,
-                                    pipeMap,
-                                    y,
-                                    x - 1,
-                                    index + 1,
-                                    Pair(y, x),
-                                    nextCardinalDirection
-                                ) != null
-                            ) {
-                                return currentNode
-                            } else {
-                                currentNode.west = null
-                            }
+                            return evaluateLoop(
+                                currentNode.west!!,
+                                pipeMap,
+                                y,
+                                x - 1,
+                                index + 1,
+                                Pair(y, x),
+                                nextCardinalDirection
+                            )
                         }
                     }
                 }
