@@ -3,42 +3,26 @@ package twentyTwentyFour.dayFive
 class PartTwo {
     companion object {
         fun execute(lines: List<String>) {
-            var isReadingFirstPart = true
-
             val rules = mutableMapOf<Int, List<Int>>()
             val pageNumberUpdates = mutableListOf<List<Int>>()
 
-            lines.forEach {
-                if (isReadingFirstPart) {
-                    if (it.trim().isEmpty()) {
-                        isReadingFirstPart = false
-                        return@forEach
-                    }
-                    readFirstPart(it, rules)
-                } else {
-                    readSecondPart(it, pageNumberUpdates)
-                }
-            }
+            val parts = lines.joinToString("\n").split("\n\n")
+            parts[0].lines().forEach { readFirstPart(it, rules) }
+            parts[1].lines().forEach { readSecondPart(it, pageNumberUpdates) }
 
             var sum = 0
-
             pageNumberUpdates.forEach { row ->
                 row.indices.forEach row@{ index ->
                     // None of the pages before should be in the list of pages that should be after the current page
-                    val isorderCorrect = row.subList(0, index).none { rules[row[index]]?.contains(it) == true }
+                    if (row.subList(0, index).none { rules[row[index]]?.contains(it) == true }) return@row
 
-                    if (isorderCorrect) return@row
                     val correctList = row.toMutableList()
-
-                    while(correctList.indices.any { isOrderNotCorrect(correctList, it, rules) }) {
-                        val indexOfWrongPlace = correctList.indexOfFirst { isOrderNotCorrect(correctList, correctList.indexOf(it), rules) }
-                        val newIndexToPlace = row.indexOf(row.first { rules[correctList[indexOfWrongPlace]]?.contains(it) == true })
-                        if(newIndexToPlace == -1) continue
-                        val pageAtWrongPlace = correctList[indexOfWrongPlace]
-                        correctList.removeAt(indexOfWrongPlace)
-                        correctList.add(newIndexToPlace, pageAtWrongPlace)
+                    // Correct the order of the list
+                    while (correctList.indices.any { isOrderNotCorrect(correctList, it, rules) }) {
+                        val indexOfWrongPlacedPage = correctList.indexOfFirst { isOrderNotCorrect(correctList, correctList.indexOf(it), rules) }
+                        val newIndexOfWrongPlacedPage = row.indexOfFirst { rules[correctList[indexOfWrongPlacedPage]]?.contains(it) == true }
+                        correctList.add(newIndexOfWrongPlacedPage, correctList.removeAt(indexOfWrongPlacedPage))
                     }
-
                     sum += correctList[row.size / 2]
                     return@forEach
                 }

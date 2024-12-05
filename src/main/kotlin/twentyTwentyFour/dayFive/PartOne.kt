@@ -3,35 +3,19 @@ package twentyTwentyFour.dayFive
 class PartOne {
     companion object {
         fun execute(lines: List<String>) {
-            var isReadingFirstPart = true
-
             val rules = mutableMapOf<Int, List<Int>>()
             val pageNumberUpdates = mutableListOf<List<Int>>()
 
-            lines.forEach {
-                if (isReadingFirstPart) {
-                    if (it.trim().isEmpty()) {
-                        isReadingFirstPart = false
-                        return@forEach
-                    }
-                    readFirstPart(it, rules)
-                } else {
-                    readSecondPart(it, pageNumberUpdates)
-                }
-            }
+            val parts = lines.joinToString("\n").split("\n\n")
+            parts[0].lines().forEach { readFirstPart(it, rules) }
+            parts[1].lines().forEach { readSecondPart(it, pageNumberUpdates) }
 
-            var sum = 0
-
-            pageNumberUpdates.forEach { row ->
-                val correct = row.indices.all { index ->
-                    // None of the pages before should be in the list of pages that should be after the current page
+            val sum = pageNumberUpdates.filter { row ->
+                row.indices.all { index ->
+                    // None of the pages before (in row) should be in the list of pages that should be after the current page
                     row.subList(0, index).none { rules[row[index]]?.contains(it) == true }
                 }
-
-                if (correct) {
-                    sum += row[row.size / 2]
-                }
-            }
+            }.sumOf { it[it.size / 2] }
 
             println("sum: $sum")
         }
