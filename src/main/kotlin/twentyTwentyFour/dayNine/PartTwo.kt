@@ -8,7 +8,7 @@ class PartTwo {
             lines.flatMap { it.toCharArray().toList() }
                 .windowed(2, 2, partialWindows = true)
                 .forEach {
-                    for (i in 1..it[0].digitToInt()) {
+                    repeat(it[0].digitToInt()) {
                         result.add(Pair(id, FieldOccupation.OCCUPIED))
                     }
                     if (it.size > 1) {
@@ -33,12 +33,9 @@ class PartTwo {
                 fillEmptyFields(it, result)
             }
 
-            var checksum = 0L
-            result.forEachIndexed { index, it ->
-                if(it.second == FieldOccupation.OCCUPIED){
-                    checksum += index * it.first!!
-                }
-             }
+            val checksum = result.withIndex()
+                .filter { it.value.second == FieldOccupation.OCCUPIED }
+                .sumOf { it.index * it.value.first!! }
             println("Checksum: $checksum")
         }
 
