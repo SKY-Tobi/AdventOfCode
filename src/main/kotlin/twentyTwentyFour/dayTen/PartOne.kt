@@ -7,9 +7,7 @@ class PartOne {
             val map = initializeMap(lines)
             val trailheads = findTrailheads(map)
             val sum = trailheads.sumOf {
-                val run = trailhead(map, it.first, it.second, 0, 0)
-                println("Run: $run")
-                run
+                trailhead(map, it.first, it.second, 0, mutableListOf())
             }
             println("Sum: $sum")
         }
@@ -30,16 +28,16 @@ class PartOne {
             return trailheads
         }
 
-        private fun trailhead(map: Array<CharArray>, x: Int, y: Int, value: Int, counter: Int): Int {
-            // TODO MARK VISITED 9
+        private fun trailhead(map: Array<CharArray>, x: Int, y: Int, value: Int, visitedFinishes: MutableList<Pair<Int, Int>>): Int {
             var tempCounter = 0
             Direction.values().forEach {
                 val (dx, dy) = it.getDeltas()
                 if (isInsideMap(map, x + dx, y + dy) && map[y + dy][x + dx].digitToInt() == value + 1) {
-                    if(value + 1 == FINISH_VALUE) {
+                    if(value + 1 == FINISH_VALUE && !visitedFinishes.contains(Pair(x + dx, y + dy))) {
                         tempCounter++
+                        visitedFinishes.add(Pair(x + dx, y + dy))
                     } else {
-                        tempCounter += trailhead(map, x + dx, y + dy, value + 1, 0)
+                        tempCounter += trailhead(map, x + dx, y + dy, value + 1, visitedFinishes)
                     }
                 }
             }
