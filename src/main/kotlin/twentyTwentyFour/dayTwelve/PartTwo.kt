@@ -3,14 +3,10 @@ package twentyTwentyFour.dayTwelve
 class PartTwo {
     companion object {
         fun execute(lines: List<String>) {
-            val map = initializeMap(lines)
+            val map = lines.map { it.toCharArray() }.toTypedArray()
             val areas = initializeAreas(map)
             val totalCost = areas.sumOf { calculateArea(it, map) }
             println("Total cost: $totalCost")
-        }
-
-        private fun initializeMap(input: List<String>): Array<CharArray> {
-            return input.map { it.toCharArray() }.toTypedArray()
         }
 
         private fun initializeAreas(map: Array<CharArray>): List<Area> {
@@ -34,7 +30,7 @@ class PartTwo {
                 val (dx, dy) = it.getDeltas()
                 val x1 = x + dx
                 val y1 = y + dy
-                if (x1 >= 0 && x1 < mapWithLeftOverPlants[y].size && y1 >= 0 && y1 < mapWithLeftOverPlants.size) {
+                if (x1 in mapWithLeftOverPlants[y].indices && y1 in mapWithLeftOverPlants.indices) {
                     if (mapWithLeftOverPlants[y1][x1] == area.label) {
                         area.plantCoordinates.add(Pair(x1, y1))
                         mapWithLeftOverPlants[y1][x1] = null
@@ -45,75 +41,64 @@ class PartTwo {
         }
 
         private fun calculateArea(area: Area, map: Array<CharArray>): Int {
-            val fenceMap = mutableMapOf<Char, MutableList<Pair<Int, Int>>>()
-            area.plantCoordinates.forEach {
-                val (x, y) = it
+            val fenceMap = mutableMapOf<Char, MutableList<Triple<Int, Int, Direction>>>()
+            area.plantCoordinates.forEach { (x, y) ->
                 Direction.values().forEach { direction ->
                     val (dx, dy) = direction.getDeltas()
                     val x1 = x + dx
                     val y1 = y + dy
-                    if (x1 < 0 || x1 >= map[y].size || y1 < 0 || y1 >= map.size || map[y1][x1] != area.label) {
+                    if (x1 !in map[y].indices || y1 !in map.indices || map[y1][x1] != area.label) {
                         when (direction) {
                             Direction.NORTH, Direction.SOUTH -> {
-                                fenceMap.computeIfAbsent('-') { mutableListOf() }.add(Pair(x1, y1))
+                                fenceMap.computeIfAbsent('-') { mutableListOf() }.add(Triple(x1, y1, direction))
                             }
                             Direction.EAST, Direction.WEST -> {
-                                fenceMap.computeIfAbsent('|') { mutableListOf() }.add(Pair(x1, y1))
+                                fenceMap.computeIfAbsent('|') { mutableListOf() }.add(Triple(x1, y1, direction))
                             }
                         }
                     }
                 }
             }
-            val numberOfSides = calculateNumberOfSides(fenceMap)
-            println("Area ${area.label}: ${area.plantCoordinates.size} plants, $numberOfSides sides")
-
-            return area.plantCoordinates.size * numberOfSides
+            return area.plantCoordinates.size * calculateNumberOfSides(fenceMap)
         }
 
-        private fun calculateNumberOfSides(fenceMap: MutableMap<Char, MutableList<Pair<Int, Int>>>): Int {
+        private fun calculateNumberOfSides(fenceMap: MutableMap<Char, MutableList<Triple<Int, Int, Direction>>>): Int {
             val horizontalFences = fenceMap['-'] ?: mutableListOf()
             val verticalFences = fenceMap['|'] ?: mutableListOf()
             var numberOfSides = 0
 
-            val unwalkedHorizontalFences = horizontalFences.toMutableList()
-            horizontalFences.forEach {
-                if(!unwalkedHorizontalFences.contains(it)) return@forEach
-
-                val walkedCoordinates = mutableListOf<Pair<Int, Int>>()
-
-                walkTillBorder(Direction.WEST, it.first, it.second, unwalkedHorizontalFences, walkedCoordinates)
-                walkTillBorder(Direction.EAST, it.first, it.second, unwalkedHorizontalFences, walkedCoordinates)
-
-                unwalkedHorizontalFences.remove(it)
-                numberOfSides++
-            }
-
-            val unwalkedVerticalFences = verticalFences.toMutableList()
-            verticalFences.forEach {
-                if(!unwalkedVerticalFences.contains(it)) return@forEach
-
-                val walkedCoordinates = mutableListOf<Pair<Int, Int>>()
-
-                walkTillBorder(Direction.NORTH, it.first, it.second, unwalkedVerticalFences, walkedCoordinates)
-                walkTillBorder(Direction.SOUTH, it.first, it.second, unwalkedVerticalFences, walkedCoordinates)
-
-                unwalkedVerticalFences.remove(it)
-                numberOfSides++
-            }
+            numberOfSides += countSides(horizontalFences, Direction.WEST, Direction.EAST)
+            numberOfSides += countSides(verticalFences, Direction.NORTH, Direction.SOUTH)
 
             return numberOfSides
         }
 
-        private fun walkTillBorder(direction: Direction, x: Int, y: Int, list: MutableList<Pair<Int, Int>>, walkedCoordinates: MutableList<Pair<Int, Int>>) {
+        private fun countSides(fences: MutableList<Triple<Int, Int, Direction>>, dir1: Direction, dir2: Direction): Int {
+            val unwalkedFences = fences.toMutableList()
+            var numberOfSides = 0
+            fences.forEach {
+                if (it in unwalkedFences) {
+                    walkTillBorder(dir1, it.first, it.second, unwalkedFences, it.third)
+                    walkTillBorder(dir2, it.first, it.second, unwalkedFences, it.third)
+                    unwalkedFences.remove(it)
+                    numberOfSides++
+                }
+            }
+            return numberOfSides
+        }
+
+        private fun walkTillBorder(
+            direction: Direction,
+            x: Int,
+            y: Int,
+            list: MutableList<Triple<Int, Int, Direction>>,
+            directionFenceFaces: Direction
+        ) {
             val (dx, dy) = direction.getDeltas()
             val x1 = x + dx
             val y1 = y + dy
-            while (list.contains(Pair(x1, y1)) && !walkedCoordinates.contains(Pair(x1, y1))) {
-                if(!walkedCoordinates.contains(Pair(x1, y1))) {
-                    list.removeAt(list.indexOf(Pair(x1, y1))) // only remove one element as there can be multiple elements with the same coordinates
-                    walkedCoordinates.add(Pair(x1, y1))
-                }
-                walkTillBorder(direction, x1, y1, list, walkedCoordinates)
+            if (list.remove(Triple(x1, y1, directionFenceFaces))) {
+                walkTillBorder(direction, x1, y1, list, directionFenceFaces)
             }
         }
     }
