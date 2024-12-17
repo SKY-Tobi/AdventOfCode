@@ -8,10 +8,7 @@ class PartTwo {
         private const val ROTATION_PENALTY = 1000
         fun execute(lines: List<String>) {
             val (map, startPoint, endPoint) = parseMap(lines)
-
-            val finishPoints = mutableListOf<Int>()
-            traverseMap(finishPoints, map, startPoint, endPoint)
-            println(finishPoints.minOrNull())
+            println(traverseMap(map, startPoint, endPoint))
         }
 
         private fun parseMap(lines: List<String>): Triple<MutableList<MutableList<Char>>, Pair<Int, Int>, Pair<Int, Int>> {
@@ -34,13 +31,13 @@ class PartTwo {
         }
 
         private fun traverseMap(
-            finishPoints: MutableList<Int>,
             map: MutableList<MutableList<Char>>,
             startPoint: Pair<Int, Int>,
             endPoint: Pair<Int, Int>
-        ) {
+        ): Int {
+            val finishPoints = mutableListOf<Int>()
             val pq = PriorityQueue<Triple<Pair<Int, Int>, Int, Direction>>(compareBy { it.second })
-            var visited = mutableSetOf<Pair<Int, Int>>()
+            val visited = mutableSetOf<Pair<Int, Int>>()
             pq.add(Triple(startPoint, 1, START_DIRECTION))
 
             while (pq.isNotEmpty()) {
@@ -66,11 +63,46 @@ class PartTwo {
                 }
             }
 
-            val minScore = finishPoints.minOrNull()
-            println("Minimum score: $minScore")
+            val correctPaths = mutableSetOf<Pair<Int, Int>>()
 
-            // TODO Backtrace
+            fun backTrace(
+                map: MutableList<MutableList<Char>>,
+                currentPosition: Pair<Int, Int>,
+                currentDirection: Direction,
+                currentPoints: Int,
+                path: MutableList<Pair<Int, Int>>,
+                maxScore: Int
+            ) {
+                for ((newDirection, delta, rotations) in currentDirection.getPossibleDirections()) {
+                    val (dx, dy) = delta
+                    val (x, y) = currentPosition
+                    val newX = x + dx
+                    val newY = y + dy
+                    var newPoints =
+                        currentPoints + 1 + if (currentPosition != endPoint) rotations * ROTATION_PENALTY else 0
 
+                    if (newPoints > maxScore) {
+                        continue
+                    }
+
+                    if (Pair(newX, newY) == startPoint) {
+                        if (currentDirection == Direction.SOUTH) {
+                            newPoints += ROTATION_PENALTY
+                        }
+                        if (newPoints <= maxScore) {
+                            correctPaths.addAll(path)
+                        }
+                    } else if (newX in map[0].indices && newY in map.indices && map[newY][newX] == '.') {
+                        path.add(Pair(newX, newY))
+                        backTrace(map, Pair(newX, newY), newDirection, newPoints, path, maxScore)
+                        path.removeAt(path.size - 1)
+                    }
+                }
+            }
+
+            backTrace(map, endPoint, Direction.WEST, 0, mutableListOf(), finishPoints.minOrNull()!!)
+
+            return 2 + correctPaths.size
         }
     }
 }
