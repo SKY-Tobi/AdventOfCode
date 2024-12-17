@@ -40,7 +40,7 @@ class PartTwo {
             endPoint: Pair<Int, Int>
         ) {
             val pq = PriorityQueue<Triple<Pair<Int, Int>, Int, Direction>>(compareBy { it.second })
-            val visited = mutableSetOf<Pair<Int, Int>>()
+            var visited = mutableSetOf<Pair<Int, Int>>()
             pq.add(Triple(startPoint, 1, START_DIRECTION))
 
             while (pq.isNotEmpty()) {
@@ -65,6 +65,12 @@ class PartTwo {
                     }
                 }
             }
+
+            val minScore = finishPoints.minOrNull()
+            println("Minimum score: $minScore")
+
+            // TODO Backtrace
+
         }
     }
 }
