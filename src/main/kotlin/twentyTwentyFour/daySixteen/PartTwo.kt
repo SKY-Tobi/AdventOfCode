@@ -1,6 +1,7 @@
 package twentyTwentyFour.daySixteen
 
 import java.util.*
+import kotlin.collections.HashSet
 
 class PartTwo {
     companion object {
@@ -35,74 +36,100 @@ class PartTwo {
             startPoint: Pair<Int, Int>,
             endPoint: Pair<Int, Int>
         ): Int {
-            val finishPoints = mutableListOf<Int>()
-            val pq = PriorityQueue<Triple<Pair<Int, Int>, Int, Direction>>(compareBy { it.second })
-            val visited = mutableSetOf<Pair<Int, Int>>()
-            pq.add(Triple(startPoint, 1, START_DIRECTION))
+            val lowestScore = getLowestScore(startPoint, START_DIRECTION, endPoint, map)
+            return getAllShortestPathLengths(startPoint, endPoint, lowestScore, map)
+        }
 
-            while (pq.isNotEmpty()) {
-                val (currentPosition, currentPoints, currentDirection) = pq.poll()
-                if (currentPosition in visited) continue
-                visited.add(currentPosition)
+        private fun getLowestScore(
+            startPoint: Pair<Int, Int>,
+            startDirection: Direction,
+            endPoint: Pair<Int, Int>,
+            map: MutableList<MutableList<Char>>
+        ): Long {
+            val visited = HashSet<Triple<Int, Int, Direction>>()
+            val scores = HashMap<Triple<Int, Int, Direction>, Long>()
+            val queue = PriorityQueue<Pair<Triple<Int, Int, Direction>, Long>>(compareBy { it.second })
 
-                for ((newDirection, delta, rotations) in currentDirection.getPossibleDirections()) {
+            queue.add(Triple(startPoint.first, startPoint.second, startDirection) to 0L)
+            while (queue.isNotEmpty()) {
+                val (current, score) = queue.poll()
+                if (Pair(current.first, current.second) == endPoint) return score
+
+                if (visited.contains(current)) continue
+                visited.add(current)
+
+                val nextMoves = current.third.getPossibleDirections().map { (newDirection, delta, rotations) ->
                     val (dx, dy) = delta
-                    val (x, y) = currentPosition
-                    val newX = x + dx
-                    val newY = y + dy
-                    val newPoints = currentPoints + 1 + rotations * ROTATION_PENALTY
+                    val newX = current.first + dx
+                    val newY = current.second + dy
+                    Triple(Pair(newX, newY), newDirection, score + 1 + rotations * ROTATION_PENALTY)
+                }
 
-                    if (Pair(newX, newY) == endPoint) {
-                        finishPoints.add(currentPoints)
-                        continue
-                    }
+                for ((nextPosition, nextDirection, nextScore) in nextMoves) {
+                    if (map[nextPosition.second][nextPosition.first] == '#' ||
+                        visited.contains(Triple(nextPosition.first, nextPosition.second, nextDirection))
+                    ) continue
 
-                    if (newX in map[0].indices && newY in map.indices && map[newY][newX] == '.') {
-                        pq.add(Triple(Pair(newX, newY), newPoints, newDirection))
+                    if (nextScore < scores.getOrDefault(Triple(nextPosition.first, nextPosition.second, nextDirection),
+                            Long.MAX_VALUE)) {
+                        scores[Triple(nextPosition.first, nextPosition.second, nextDirection)] = nextScore
+                        queue.add(Triple(nextPosition.first, nextPosition.second, nextDirection) to nextScore)
                     }
                 }
             }
+            return Long.MAX_VALUE - Int.MAX_VALUE
+        }
 
-            val correctPaths = mutableSetOf<Pair<Int, Int>>()
+        private fun getAllShortestPathLengths(
+            startPoint: Pair<Int, Int>,
+            endPoint: Pair<Int, Int>,
+            targetScore: Long,
+            map: MutableList<MutableList<Char>>
+        ): Int {
+            val visited = HashSet<Triple<Int, Int, Direction>>()
+            val queue = ArrayDeque<Triple<Pair<Int, Int>, Direction, Long>>()
+            val validPositions = HashSet<Pair<Int, Int>>()
 
-            fun backTrace(
-                map: MutableList<MutableList<Char>>,
-                currentPosition: Pair<Int, Int>,
-                currentDirection: Direction,
-                currentPoints: Int,
-                path: MutableList<Pair<Int, Int>>,
-                maxScore: Int
-            ) {
-                for ((newDirection, delta, rotations) in currentDirection.getPossibleDirections()) {
+            queue.add(Triple(startPoint, Direction.EAST, 0L))
+            while (queue.isNotEmpty()) {
+                val (currentPosition, currentDirection, currentScore) = queue.removeFirst()
+                validPositions.add(currentPosition)
+
+                if (currentPosition == endPoint) continue
+
+                if (visited.contains(Triple(currentPosition.first, currentPosition.second, currentDirection))) continue
+                visited.add(Triple(currentPosition.first, currentPosition.second, currentDirection))
+
+                val nextMoves = currentDirection.getPossibleDirections().map { (newDirection, delta, rotations) ->
                     val (dx, dy) = delta
-                    val (x, y) = currentPosition
-                    val newX = x + dx
-                    val newY = y + dy
-                    var newPoints =
-                        currentPoints + 1 + if (currentPosition != endPoint) rotations * ROTATION_PENALTY else 0
+                    val newX = currentPosition.first + dx
+                    val newY = currentPosition.second + dy
+                    Triple(Pair(newX, newY), newDirection, 1 + rotations * ROTATION_PENALTY)
+                }
 
-                    if (newPoints > maxScore) {
-                        continue
-                    }
+                for (nextPosition in nextMoves) {
+                    if (map[nextPosition.first.second][nextPosition.first.first] == '#' || visited.contains(
+                            Triple(
+                                nextPosition.first.first,
+                                nextPosition.first.second,
+                                nextPosition.second
+                            )
+                        )
+                    ) continue
+                    if (currentScore + nextPosition.third + getLowestScore(
+                            nextPosition.first,
+                            nextPosition.second,
+                            endPoint,
+                            map
+                        ) > targetScore
+                    ) continue
 
-                    if (Pair(newX, newY) == startPoint) {
-                        if (currentDirection == Direction.SOUTH) {
-                            newPoints += ROTATION_PENALTY
-                        }
-                        if (newPoints <= maxScore) {
-                            correctPaths.addAll(path)
-                        }
-                    } else if (newX in map[0].indices && newY in map.indices && map[newY][newX] == '.') {
-                        path.add(Pair(newX, newY))
-                        backTrace(map, Pair(newX, newY), newDirection, newPoints, path, maxScore)
-                        path.removeAt(path.size - 1)
-                    }
+                    val nextScore = currentScore + nextPosition.third
+                    queue.add(Triple(nextPosition.first, nextPosition.second, nextScore))
                 }
             }
 
-            backTrace(map, endPoint, Direction.WEST, 0, mutableListOf(), finishPoints.minOrNull()!!)
-
-            return 2 + correctPaths.size
+            return validPositions.count()
         }
     }
 }
