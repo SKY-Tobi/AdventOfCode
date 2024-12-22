@@ -23,6 +23,7 @@ fun main() {
         "16" -> daySixteen()
         "17" -> daySeventeen()
         "18" -> dayEighteen()
+        "19" -> dayNineteen()
         "all" -> {
             dayOne()
             dayTwo()
@@ -42,6 +43,7 @@ fun main() {
             daySixteen()
             daySeventeen()
             dayEighteen()
+            dayNineteen()
         }
         else -> println("invalid input")
     }
@@ -224,5 +226,15 @@ fun dayEighteen() {
     twentyTwentyFour.dayEighteen.PartOne.execute(lines)
     println("Part Two:")
     twentyTwentyFour.dayEighteen.PartTwo.execute(lines)
+    println()
+}
+
+fun dayNineteen() {
+    val lines = readFileAsLinesUsingReadLines("src/main/resources/2024/DayNineTeenInput.txt")
+    println("Day 19:")
+    println("Part One:")
+    twentyTwentyFour.dayNineteen.PartOne.execute(lines)
+    println("Part Two:")
+    twentyTwentyFour.dayNineteen.PartTwo.execute(lines)
     println()
 }
