@@ -35,7 +35,7 @@ class PartTwo {
 
             val checksum = result.withIndex()
                 .filter { it.value.second == FieldOccupation.OCCUPIED }
-                .sumOf { it.index * it.value.first!! }
+                .sumOf { it.index.toLong() * it.value.first!!.toLong() }
             println("Checksum: $checksum")
         }
 
